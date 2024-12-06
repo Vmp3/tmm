@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<tmm projectname="TMM Ajustado">
+  <head>
+    <meta name="author" content="Seu Nome"/>
+    <meta name="company" content="Sua Empresa"/>
+    <meta name="description" content="Este projeto multiplica 1 serviço ajustado."/>
+  </head>
+  <body>
+    <inputs>
+      <av id="stream1-video" src="../video.ts" pid="256"/>
+      <av id="stream1-audio" src="../video.ts" pid="257"/>
+
+
+      <pmt id="pmt1" programnumber="1" pid="1000" pcrpid="273" name="Program1">
+        <es refid="stream1-video" pid="1002"/>
+        <es refid="stream1-audio" pid="1003"/>
+      </pmt>
+    </inputs>
+    
+    <output dest="output.ts" bitrate="1998000" time="2013-10-07T17:23:00-03:00">
+      <item dur="90000">
+        <pmtref pmtid="pmt1"/>
+      </item>
+    </output>
+  </body>
+</tmm>
