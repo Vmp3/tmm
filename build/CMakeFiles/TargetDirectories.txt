@@ -1,6 +1,0 @@
-/home/vicente/Documents/new test/tmm/build/CMakeFiles/tm-muxer.dir
-/home/vicente/Documents/new test/tmm/build/CMakeFiles/edit_cache.dir
-/home/vicente/Documents/new test/tmm/build/CMakeFiles/rebuild_cache.dir
-/home/vicente/Documents/new test/tmm/build/tmm-mpeg2ts/CMakeFiles/tmm-mpeg2ts.dir
-/home/vicente/Documents/new test/tmm/build/tmm-mpeg2ts/CMakeFiles/edit_cache.dir
-/home/vicente/Documents/new test/tmm/build/tmm-mpeg2ts/CMakeFiles/rebuild_cache.dir

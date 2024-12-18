@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<tmm projectname="Telemidia TMM sample">
+  <head>
+    <meta name="author" content="Vicente"/>
+    <meta name="company" content="Zedia"/>
+    <meta name="description" content="This project multiplexes 1 service."/>
+  </head>
+  <body>
+    <inputs>
+      <av id="stream1-video" src="/home/joaovicente/Area de Trabalho/novocorreto/meu git tmm/tmm/novovideo.ts" pid="256"/>
+      <av id="stream1-audio" src="/home/joaovicente/Area de Trabalho/novocorreto/meu git tmm/tmm/novovideo.ts" pid="257"/>
+      
+      <carousel id="carousel" 
+                src="/home/joaovicente/Area de Trabalho/novocorreto/tmm/build/carousel/1/temp/fellow-v0.5.12-1733955436-ebe55c6d-3faa-4d23-8f7f-df897b1bddab"
+                servicedomain="1" 
+                bitrate="4000000" 
+                transactionid="1" 
+                componenttag="64"/>
+
+      <tap id="tap1" tapid="0" tapuse="streventuse" associationtag="100"/>
+      
+      <streamevent id="streamevent1" 
+                  period="1000" 
+                  samplelimit="0" 
+                  carouselid="carousel" 
+                  baseid="1"
+                  documentid="defaultNCL"
+                  entrypoint="main.ncl">
+        <event eventid="1" eventnpt="0" commandtag="startdocument" params=""/>
+      </streamevent>
+
+      <eit id="eit1">
+        <event eventid="1" time="2024-01-17T12:00:00-03:00" dur="90000">
+          <shortevent name="Aplicativo Ginga" text="Aplicação NCL" language="por"/>
+          <component streamcontent="5" componenttype="195" ctag="64" language="por"/>
+        </event>
+      </eit>
+
+      <ait id="ait">
+        <carouselref carouselid="carousel" 
+                     apptype="ginga-ncl" 
+                     appname="testapp"
+                     organizationid="1" 
+                     applicationid="1" 
+                     entrypoint="main.ncl" 
+                     appcontrolcode="present"
+                     version="1.0.0"
+                     priority="1"
+                     visibility="3"
+                     servicebound="1"/>
+      </ait>
+
+      <pmt id="pmt1" 
+           servicenumber="1" 
+           pid="1000" 
+           pcrpid="256" 
+           name="Telemidia"
+           servicetype="tv"> 
+        <es refid="stream1-video" pid="256"/>
+        <es refid="stream1-audio" pid="257">
+          <aac profileandlevel="46"/>
+          <iso639language language="por" audiotype="1"/>
+        </es>
+        <es refid="ait" pid="1300"/>
+        <es refid="carousel" pid="1900" componenttag="64">
+          <ginga version="1.0.0"/>
+        </es>
+        <es refid="streamevent1" pid="2000"/>
+      </pmt>
+    </inputs>
+
+    <output dest="192.168.8.188:1234" 
+            name="Telemidia Network" 
+            tsname="Telemidia TV" 
+            bitrate="20680000" 
+            packetspermessage="7"
+            vbv="2000"
+            usesystime="true"
+            countrycode="BRA"
+            countryregionid="3"
+            partialreception="true"
+            generatingstation="zyb522"
+            virtualchannel="1"
+            guardinterval="1/8"
+            ttl="100">
+      <item dur="90000"> 
+        <pmtref pmtid="pmt1"/>
+      </item>
+    </output>
+  </body>
+</tmm>
