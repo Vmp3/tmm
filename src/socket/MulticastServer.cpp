@@ -21,15 +21,21 @@ namespace pucrio {
 namespace telemidia {
 namespace tool {
 MulticastServer::MulticastServer(const char* group, int portNumber) {
-	this->groupAddr = (char*) group;
-	this->portNumber = portNumber;
+    this->groupAddr = (char*) group;
+    this->portNumber = portNumber;
 
-	mAddr.sin_family = AF_INET;
-	mAddr.sin_addr.s_addr = inet_addr(this->groupAddr);
-	mAddr.sin_port = htons(this->portNumber);
-
-	loopedBack = 0;
-	ttl = 16;
+    mAddr.sin_family = AF_INET;
+    
+    if (inet_pton(AF_INET, this->groupAddr, &mAddr.sin_addr) <= 0) {
+        std::cerr << "Invalid address format: " << this->groupAddr << std::endl;
+        return; 
+    }
+    mAddr.sin_port = htons(this->portNumber);
+    std::cout << "Configurando IP: " << this->groupAddr << std::endl;
+    std::cout << "IP de destino: " << this->groupAddr << std::endl;
+	
+    loopedBack = 0;
+    ttl = 16;
 }
 
 MulticastServer::~MulticastServer() {

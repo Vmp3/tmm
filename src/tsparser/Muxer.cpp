@@ -170,70 +170,80 @@ void Muxer::setTTL(unsigned char t) {
 }
 
 int Muxer::open() {
-	if (isFileMode) {
-		if (!isPipe) {
-			pFile = fopen(destination.c_str(), "wb");
-			if (pFile == NULL) {
-				cout << "Muxer::open - Unable to open file: " <<
+    if (isFileMode) {
+        if (!isPipe) {
+            pFile = fopen(destination.c_str(), "wb");
+            if (pFile == NULL) {
+                cout << "Muxer::open - Unable to open file: " <<
 						destination << endl;
-				return -1;
-			}
-		} else {
-			pPipe = new Pipe(destination);
-			if (externalApp.size()) {
-				cout << "Starting external application...";
-				if (LocalLibrary::executeApp(externalApp, appParams, &appPid)) {
-					cout << " done." << endl;
-				} else {
-					cout << " fail." << endl;
-				}
-			}
-			if (!pPipe->createPipe()) {
-				cout << "Muxer::open - Unable to open pipe: " <<
-						pPipe->getPipeName() << endl;
-				return -2;
-			}
-		}
-	} else {
-		string ip, port;
-		unsigned found = destination.find("://");
-		ip.assign(destination, found+3, 25);
-		found = ip.find(":");
-		port.assign(ip, found+1, 5);
-		ip.assign(ip, 0, found);
-		int num = atol(port.c_str());
-		server = new MulticastServer(ip.c_str(), num);
-		if (!server->createSocket()) {
-			cout << "Muxer::open - Unable to open socket: " <<
-					destination << endl;
-			delete server;
-			server = NULL;
-			return -3;
-		}
-		server->setTTL(ttl);
-	}
-	return 0;
+                return -1;
+            }
+        } else {
+            pPipe = new Pipe(destination);
+            if (externalApp.size()) {
+                cout << "Starting external application...";
+                if (LocalLibrary::executeApp(externalApp, appParams, &appPid)) {
+                    cout << " done." << endl;
+                } else {
+                    cout << " fail." << endl;
+                }
+            }
+            if (!pPipe->createPipe()) {
+                cout << "Muxer::open - Unable to open pipe: " << pPipe->getPipeName() << endl;
+                return -2;
+            }
+        }
+    } else {
+        string ip, port;
+        size_t colonPos = destination.find(":");
+
+        if (colonPos != string::npos) {
+            ip = destination.substr(0, colonPos);
+            port = destination.substr(colonPos + 1);
+        } else {
+            cout << "Muxer::open - Invalid destination format: " << destination << endl;
+            return -4;
+        }
+
+        int num = atoi(port.c_str());
+        if (num <= 0 || num > 65535) {
+            cout << "Muxer::open - Invalid port number: " << port << endl;
+            return -5;
+        }
+
+        server = new MulticastServer(ip.c_str(), num);
+
+        if (!server->createSocket()) {
+            cout << "Muxer::open - Unable to open socket: " << destination << endl;
+            delete server;
+            server = NULL;
+            return -3;
+        }
+        server->setTTL(ttl);
+    }
+    return 0;
 }
 
 int Muxer::close() {
-	if (isFileMode) {
-		if (!isPipe) {
-			if (pFile) fclose(pFile);
-			pFile = NULL;
-		} else {
-			if (pPipe) {
-				if (!LocalLibrary::killApp(appPid)) {
-					cout << "Muxer::close - External application could ";
-					cout << "not be closed!" << endl;
-				}
-				pPipe->closePipe();
-				delete pPipe;
-			}
-			pPipe = NULL;
-		}
-	}
-	return 0;
+    if (isFileMode) {
+        if (!isPipe) {
+            if (pFile) fclose(pFile);
+            pFile = NULL;
+        } else {
+            if (pPipe) {
+                if (!LocalLibrary::killApp(appPid)) {
+                    cout << "Muxer::close - External application could not be closed!" << endl;
+                }
+                pPipe->closePipe();
+                delete pPipe;
+            }
+            pPipe = NULL;
+        }
+    }
+    return 0;
 }
+
+
 
 int Muxer::sendStreamBuffer() {
 	if (streamBufferLength == streamBufferSize) {
@@ -1023,7 +1033,7 @@ int Muxer::calculateBitrate() {
 	pktStc = (double) stcStep * ((double) 1 / pktPerStepInterval);
 
 	value = (double)tspsLayerA / (ofdmFrameSize / pktPerStepInterval);
-	fixedFracPktPerStepIntervalLayerA = modf(value, &intpart);
+	fixedFracPktPerStepIntervalLayerA = modf(value, &intpart	);
 	fracPktPerStepIntervalLayerA = fixedFracPktPerStepIntervalLayerA;
 	pktPerStepIntervalLayerA = (int)value;
 	value = (double)tspsLayerB / (ofdmFrameSize / pktPerStepInterval);
